@@ -1,0 +1,315 @@
+ /* General layout */
+ html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Main content */
+  main {
+    flex: 1;
+    padding: 20px;
+  }
+
+  /* Style Peta */
+  #mapdiv {
+    height: 100vh;
+  }
+
+
+  /* Style Kusor */
+  .leaflet-container {
+    cursor: crosshair !important;
+  }
+
+/* Popup Container */
+.popup-container {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  padding: 10px;
+  min-width: 300px;
+  color: #2c3e50;
+}
+
+/* Table Style */
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.popup-table th {
+  text-align: left;
+  background-color: #f5f5f5;
+  padding: 5px;
+  width: 40%;
+  vertical-align: top;
+  color: #34495e;
+  font-weight: 600;
+}
+
+.popup-table td {
+  padding: 5px;
+  color: #2c3e50;
+}
+
+.leaflet-control-geocoder {
+  max-width: 300px;
+  z-index: 1000;
+}
+
+/* Style Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0px;
+    left: 45px;
+    width: 500px;
+    height: 40%; /* Menjaga sidebar sepanjang halaman */
+    background: #f9f9f9;
+    border-right: 1px solid #ccc;
+    padding: 15px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    overflow-y: auto; /* Menambahkan scroll vertikal jika konten lebih tinggi dari sidebar */
+    max-height: 100vh; /* Membatasi sidebar agar tidak melebihi tinggi tampilan */
+  }
+
+.toggle-btn {
+  position: absolute;
+  top: 60px;
+  left: 10px; /* Posisi tombol di samping sidebar */
+  z-index: 1001; /* Memastikan tombol berada di atas konten sidebar */
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: left 0.3s ease;
+}
+
+/* Kalau sidebar disembunyikan, tombol akan ikut ke kiri */
+.sidebar.hidden + .toggle-btn {
+  left: 10px; /* Tombol akan berada di kiri jika sidebar disembunyikan */
+}
+
+.sidebar.hidden {
+  left: -400px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+      width: 90%;           /* Sidebar memenuhi hampir seluruh lebar layar */
+      left: 0;              /* Tempel ke kiri penuh */
+      height: 50%;          /* Tinggi lebih fleksibel untuk mobile */
+      top: 0;
+      padding: 10px;
+    }
+  
+    .toggle-btn {
+      top: 60px;
+      left: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+  
+    .sidebar.hidden {
+      left: -100%;          /* Dorong sidebar sepenuhnya ke luar layar */
+    }
+  }
+
+.layer {
+  margin-bottom: 30px; /* Tambah sedikit jarak antar layer */
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.layer:last-child {
+  border-bottom: none; /* Hilangkan garis bawah di layer terakhir */
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 20px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background-color: white;
+  left: 2px;
+  bottom: 2px;
+  transition: 0.4s;
+}
+
+.toggle-switch input:checked + .slider {
+  background-color: #2196F3;
+}
+
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Info Icon */
+.anchors {
+  font-size: 18px;
+  color: #007bff;
+  cursor: pointer;
+}
+
+/* Info Box */
+.info {
+  display: none;
+  margin-top: 10px;
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: 12px;
+}
+
+.info p {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+/* Legend Styles */
+.legend {
+  margin-top: 10px;
+}
+
+.legend_item {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.legend_color {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border: 1px solid #333;
+}
+
+.legend_label {
+  font-size: 9.5px;
+  font-style: italic;
+  color: #222;
+}
+
+/* legend_gradient Deforetasion & Degredatation */
+.legend_gradient {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.gradient_item {
+  display: flex;
+  align-items: center;
+}
+
+.gradient_color {
+  width: 4px;
+  height: 10px;
+}
+
+.gradient_label {
+  font-size: 12px;
+  margin: 0 6px;
+}
+
+/* Line Tahun */
+.line-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 10px 0;
+  position: relative;
+  white-space: nowrap;
+  border-top: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  background-color: #fff;
+  scroll-snap-type: x mandatory;
+}
+
+.year-item {
+  flex: 0 0 auto;
+  text-align: center;
+  margin: 0 5px;
+  cursor: pointer;
+  position: relative;
+  font-size: 8px;
+  scroll-snap-align: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #999;
+  border-radius: 30%;
+  margin: 0 auto 3px;
+  transition: all 0.3s ease;
+}
+
+.year-item.active .dot {
+  background: #28a745;
+  transform: scale(1);
+}
+
+.year-item.active .year {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.line {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ccc;
+  z-index: -1;
+}
