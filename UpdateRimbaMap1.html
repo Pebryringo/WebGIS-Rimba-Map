@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Rimba Map</title>
+
+	<link rel="stylesheet" href="Styles.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.0/leaflet.css">
+	<link rel="stylesheet" href="Plugins/basemap/basemap_leaflet.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="Plugins/jquery/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
+    <link rel="stylesheet" href="Plugins/mouseposition/L.Control.MousePosition.css">
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"/>
+    <link rel="stylesheet" href="Plugins/minimap/Control.MiniMap.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.0/leaflet.js"></script>
+	<script src="Plugins/basemap/basemap_leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+    <script src="Plugins/jquery/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+    <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
+    <script src="Plugins/mouseposition/L.Control.MousePosition.js"></script>
+    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
+    <script src="Plugins/minimap/Control.MiniMap.js"></script>
+    <script src="Plugins/ajax/leaflet.ajax.js"></script>
+	<script src="Plugins/print/leaflet.browser.print.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js"></script>
+	<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+	<script src="https://unpkg.com/leaflet-omnivore@0.3.1/leaflet-omnivore.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+	<script src="https://unpkg.com/esri-leaflet@3.0.11/dist/esri-leaflet.js"></script>
+
+    <style>
+
+		/* Style Navbar */
+		.navbar-container {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		header {
+			background-color: #f39c12;
+			color: black;
+			padding: 10px 20px;
+		}
+		
+		.logo {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			font-weight: bold;
+			font-size: 25px;
+		}
+		
+		.logo img {
+			height: 40px;
+		}
+		
+		.nav-links {
+			display: flex;
+			gap: 20px;
+		}
+		
+		.nav-links a {
+			color: black;
+			text-decoration: none;
+			font-weight: bold;
+		}
+		
+		.nav-links a:hover {
+			text-decoration: underline;
+		}
+
+		.sidebar {
+			top: 60px; /* Menjaga sidebar tetap di bawah header */
+		}
+
+		/* Footer */
+		footer {
+			background-color: #f39c12;
+			color: black;
+			text-align: center;
+			padding: 2px 2px;
+			font-size: 14px;
+			font-weight: bold;
+		}
+
+		.footer-content {
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 0 5px;
+		}
+
+		.footer-content p {
+			margin: 5px 0;
+		}
+
+	    /*--Import file KML/KMZ--*/
+		.custom-file-upload {
+			position: absolute;
+			bottom: 120px;
+			right: 140px;
+			background-color: white;
+			padding: 2px 4px;
+			border-radius: 5px;
+			box-shadow: 0 0 2px rgba(0,0,0,0.3);
+			font-family: sans-serif;
+			font-size: 14px;
+			z-index: 1000;
+		}
+
+		.custom-file-upload input[type="file"] {
+			display: none;
+		}
+
+		.custom-file-upload label {
+			cursor: pointer;
+			color: #1b2631;
+			font-weight: bold;
+		}
+
+		.info.legend {
+			background: white;
+			padding: 10px;
+			border-radius: 5px;
+			font-size: 12px;
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			max-height: 300px;
+			overflow-y: auto;
+		}
+		.legend-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+		.legend-item img {
+			max-width: 100%;
+			height: auto;
+			display: block;
+		}
+
+		.legend_color img {
+			width: 100%; /* Sesuaikan gambar dengan ukuran kontainer */
+			height: 100%; /* Sesuaikan gambar dengan ukuran kontainer */
+			object-fit: cover; /* Menjaga proporsi gambar */
+		}
+
+		.legend_color {
+			width: 15px; /* Lebar gambar */
+			height: 15px; /* Tinggi gambar */
+			margin-right: 10px;
+			border: 1px solid #000000;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+	</style>
+
+
+</head>
+<body>
+	<script></script>
+	<!-- Import file KML/KMZ -->
+	<div class="custom-file-upload">
+		<label for="kml-file">📂 Import File KML/KMZ</label>
+		<input type="file" id="kml-file" accept=".kml,.kmz">
+	  </div>
+    <!-- Navbar -->
+    <header>
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="Data/image/Logo.png" alt="Logo">
+                <span>Rimba Map</span>
+            </div>
+            <nav class="nav-links">
+                <!-- <a href="../../public/index.php">Beranda</a>
+                <a href="../../src/pages/peta.php">Peta</a>
+                <a href="../../src/pages/tentang.php">Tentang</a> -->
+            </nav>
+        </div>
+    </header>
+
+	<!-- Map Container -->
+	<div id="mapdiv" class="col-md-12"></div>
+
+	<!-- Footer -->
+	<footer class="bg-gray-100 dark:bg-gray-900 text-center text-sm py-6 mt-10">
+		<div class="text-gray-700 dark:text-gray-300">
+		  <p>&copy; 2025 <span class="font-semibold">Rimba Map</span>. Semua Hak Dilindungi.</p>
+		  <p>
+			Kontak: <a href="mailto:pebrysiringoringo@gmail.com" class="hover:underline">pebrysiringoringo@gmail.com</a> | 
+			<a href="https://wa.me/6282123330324" class="hover:underline" target="_blank">+62 821 2333 0324</a>
+		  </p>
+	  
+		  <!-- Ikon Sosmed -->
+		  <div class="flex justify-center mt-4 text-2xl gap-[1cm]">
+			<a href="https://www.linkedin.com/in/pebry-ringo-a19835219" target="_blank"
+			   class="text-blue-700 hover:text-blue-900 dark:hover:text-blue-400 transition-transform duration-300 hover:scale-125 hover:rotate-6">
+			  <i class="fa-brands fa-linkedin"></i>
+			</a>
+			<a href="https://github.com/Pebryringo" target="_blank"
+			   class="text-gray-800 hover:text-black dark:text-gray-300 dark:hover:text-white transition-transform duration-300 hover:scale-125 hover:rotate-6">
+			  <i class="fa-brands fa-github"></i>
+			</a>
+			<a href="https://instagram.com/pebryringo" target="_blank"
+			   class="text-pink-600 hover:text-pink-800 dark:hover:text-pink-400 transition-transform duration-300 hover:scale-125 hover:rotate-6">
+			  <i class="fa-brands fa-instagram"></i>
+			</a>
+			<a href="https://wa.me/6282123330324" target="_blank"
+			   class="text-green-500 hover:text-green-700 dark:hover:text-green-400 transition-transform duration-300 hover:scale-125 hover:rotate-6">
+			  <i class="fa-brands fa-whatsapp"></i>
+			</a>
+		  </div>
+		</div>
+	  </footer>
+
+	<!-- Toggle Sidebar -->
+	<button id="toggleSidebar" class="toggle-btn">☰</button>
+
+	<div class="sidebar hidden" id="sidebar">
+		<div class="layer">
+		  <div class="layer-row">
+			<span class="title">Undisturbed and Degraded Tropical Moist Forest</span>
+			<label class="toggle-switch">
+			  <input type="checkbox" id="UndisturbedDegradedForestLayer" />
+			  <span class="slider"></span>
+			</label>
+			<div class="anchors">
+			  <i class="fas fa-info-circle"></i>
+			</div>
+		  </div>
+		  <div class="info">
+			<div class="description">
+                <p>
+                    This map shows the coverage of undisturbed and degraded tropical moist forests remaining at the end of the year 2024.
+                    For the undisturbed class, no disturbance has been observed over the Landsat historical record over the period 1982–2024.
+                    Forests include mangroves and bamboo-dominated forest types.
+                </p>
+			  <div class="legend">
+				<div class="legend_item"><div class="legend_color" style="background-color:rgb(0,90,0)"></div><div class="legend_label">Undisturbed tropical moist forest</div></div>
+				<div class="legend_item"><div class="legend_color" style="background-color:rgb(100,155,35)"></div><div class="legend_label">Degraded tropical moist forest</div></div>
+				<div class="legend_item"><div class="legend_color" style="background-color:rgb(255,255,255)"></div><div class="legend_label">Other land cover</div>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		<div class="layer">
+		  <div class="layer-row">
+			<span class="title">Transition Map-Subtypes</span>
+			<label class="toggle-switch">
+			  <input type="checkbox" id="TransitionMap_SubtypesLayer" />
+			  <span class="slider"></span>
+			</label>
+			<div class="anchors">
+			  <i class="fas fa-info-circle"></i>
+			</div>
+		  </div>
+		  <div class="info">
+			<div class="description">
+                <p>
+                The transition map captures the sequential dynamics of changes by providing transition stages from the first year of the monitoring period to the end of the year 2024. 
+                It depicts five main land cover types with a few sub types: (i) remaining undisturbed moist forests (including the mangroves and the bamboo-dominated forest), 
+                (ii) degraded forests with two sub types corresponding mostly to either logged or burned forests, (iii) young forest regrowth, 
+                (iv) deforested land that includes three subcategories of converted land cover: 
+                (a) water bodies (new dams and river flow changes); (b) tree plantations; and (c) other land cover that includes infrastructure, agriculture and mining, and (v) non TMF cover (including afforestation).
+                </p>
+                <div class="legend">
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,80,0)></div> <div class=legend_label>10. Undisturbed tropical moist forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(10,100,10)></div> <div class=legend_label>11. Bamboo-dominated forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(10,90,60)></div> <div class=legend_label>12. Undisturbed mangrove</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(30,120,0)></div> <div class=legend_label>21. Degraded forest with short-duration disturbance (started before 2015)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(80,150,0)></div> <div class=legend_label>22. Degraded forest with short-duration disturbance (started in 2015-2023)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(100,160,40)></div> <div class=legend_label>23. Degraded forest with long-duration disturbance (started before 2015)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(120,170,40)></div> <div class=legend_label>24. Degraded forest with long-duration disturbance (started in 2015-2023)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(100,160,40)></div> <div class=legend_label>25. Degraded forest with 2/3 short degradation periods (last degradation started before 2015)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(120,170,40)></div> <div class=legend_label>26. Degraded forest with 2/3 short degradation periods (last degradation started in 2015-2023)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(185,200,60)></div> <div class=legend_label>31. Old forest regrowth (disturbed before 2005)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(200,230,60)></div> <div class=legend_label>32. Young forest regrowth (disturbed in 2005-2014)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(210,250,60)></div> <div class=legend_label>33. Very young forest regrowth (disturbed in 2015-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,240,160)></div> <div class=legend_label>41. Deforestation started before 2014</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,150,8)></div> <div class=legend_label>42. Deforestation started in 2014-2021</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,60,10)></div> <div class=legend_label>51. Deforestation started in 2022</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(170,80,10)></div> <div class=legend_label>52. Deforestation started in 2023</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(140,100,30)></div> <div class=legend_label>53. Deforestation started in 2024</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(140,120,60)></div> <div class=legend_label>54. Degradation started in 2024</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(40,100,50)></div> <div class=legend_label>61. Degraded mangrove (started before 2015)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(80,150,0)></div> <div class=legend_label>62. Mangrove recently degraded (2015 -2023)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(200,230,60)></div> <div class=legend_label>63. Mangrove regrowing (at least 10 years - 2015-2024)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(210,250,60)></div> <div class=legend_label>64. Mangrove regrowing (at least 3 years - 2022-2024)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,230,110)></div> <div class=legend_label>65. Mangrove deforested (started before 2014)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,60,10)></div> <div class=legend_label>66. Mangrove deforested (started in 2015-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(155,105,70)></div> <div class=legend_label>67. Mangrove recently disturbed (started in 2022-2024)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,50,150)></div> <div class=legend_label>71. Permanent water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,150,200)></div> <div class=legend_label>72. Seasonal water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,160,150)></div> <div class=legend_label>73. Deforestation to permanent water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,210,210)></div> <div class=legend_label>74. Deforestation to seasonal water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(51,99,51)></div> <div class=legend_label>81. Old plantation</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(98,161,80)></div> <div class=legend_label>82. Plantation regrowing (disturbed before 2015)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(188,209,105)></div> <div class=legend_label>83. Plantation regrowing (disturbed in 2015-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,228,148)></div> <div class=legend_label>84. Conversion to tree plantation (deforestation started before 2014)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(250,180,150)></div> <div class=legend_label>85. Conversion to tree plantation (deforestation started in 2015-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(204,163,163)></div> <div class=legend_label>86. Recent conversion to plantation (started in 2022-2024)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,255,255)></div> <div class=legend_label>91. Other land cover without afforestation</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(237,255,215)></div> <div class=legend_label>92. Young afforestation (between 3 and 9 years of regrowth)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(224,250,157)></div> <div class=legend_label>93. Old afforestation (between 10 and 20 years of regrowth)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(214,250,188)></div> <div class=legend_label>94. Water converted recently into forest regrowth (at least 3 years)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Hybrid Transition Map-Subtypes</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="TransitionMapHybrid_SubtypesLayer" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+            <div class="description">
+                <p>
+                The hybrid transition map combines the recently updated transition map derived from Landsat images at 30m (Sub types) for the period 1990-2022,
+                with the detections of forest disturbances by Sentinel 2 at 10m for the year 2022. 
+                It captures the sequential dynamics of changes by providing transition stages from the first year of the monitoring period to the end of 2022. 
+                The data source of each disturbance detection can be identified via the query mode.
+                </p>
+                <div class="legend">
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,80,0)></div> <div class=legend_label>Undisturbed tropical moist forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(10,100,10)></div> <div class=legend_label>Bamboo-dominated forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(10,90,60)></div> <div class=legend_label>Undisturbed mangrove</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(30,120,0)></div> <div class=legend_label>Degraded forest with short-duration disturbance (started before 2013)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(80,150,0)></div> <div class=legend_label>Degraded forest with short-duration disturbance (started in 2013-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(100,160,40)></div> <div class=legend_label>Degraded forest with long-duration disturbance (started before 2013)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(120,170,40)></div> <div class=legend_label>Degraded forest with long-duration disturbance (started in 2013-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(100,160,40)></div> <div class=legend_label>Degraded forest with 2/3 short degradation periods (last degradation started before 2013)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(120,170,40)></div> <div class=legend_label>Degraded forest with 2/3 short degradation periods (last degradation started in 2013-2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(185,200,60)></div> <div class=legend_label>Old forest regrowth (disturbed before 2003)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(200,230,60)></div> <div class=legend_label>Young forest regrowth (disturbed in 2003-2012)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(210,250,60)></div> <div class=legend_label>Very young forest regrowth (disturbed in 2013-2019)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,240,160)></div> <div class=legend_label>Deforestation started before 2012</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,150,8)></div> <div class=legend_label>Deforestation started in 2012-2019</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,60,10)></div> <div class=legend_label>Deforestation started in 2020</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(170,80,10)></div> <div class=legend_label>Deforestation started in 2021</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(140,100,30)></div> <div class=legend_label>Deforestation started in 2022</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(140,120,60)></div> <div class=legend_label>Degradation started in 2022</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(40,100,50)></div> <div class=legend_label>Degraded mangrove (started before 2013)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(80,150,0)></div> <div class=legend_label>Mangrove recently degraded (2013 -2021)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(200,230,60)></div> <div class=legend_label>Mangrove regrowing (at least 10 years - 2013-2022)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(210,250,60)></div> <div class=legend_label>Mangrove regrowing (at least 3 years - 2020-2022)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,230,110)></div> <div class=legend_label>Mangrove deforested (started before 2012)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,60,10)></div> <div class=legend_label>Mangrove deforested (started in 2013-2019)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(155,105,70)></div> <div class=legend_label>Mangrove recently disturbed (started in 2020-2022)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,50,150)></div> <div class=legend_label>Permanent water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,150,200)></div> <div class=legend_label>Seasonal water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,160,150)></div> <div class=legend_label>Deforestation to permanent water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,210,210)></div> <div class=legend_label>Deforestation to seasonal water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(51,99,51)></div> <div class=legend_label>Old plantation</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(98,161,80)></div> <div class=legend_label>Plantation regrowing (disturbed before 2013)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(188,209,105)></div> <div class=legend_label>Plantation regrowing (disturbed in 2013-2019)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,228,148)></div> <div class=legend_label>Conversion to tree plantation (deforestation started before 2012)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(250,180,150)></div> <div class=legend_label>Conversion to tree plantation (deforestation started in 2013-2019)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(204,163,163)></div> <div class=legend_label>Recent conversion to plantation (started in 2020-2022)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,255,255)></div> <div class=legend_label>Other land cover without afforestation</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(237,255,215)></div> <div class=legend_label>Young afforestation (between 3 and 9 years of regrowth)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(224,250,157)></div> <div class=legend_label>Old afforestation (between 10 and 20 years of regrowth)</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(214,250,188)></div> <div class=legend_label>Water converted recently into forest regrowth (at least 3 years)</div>
+                    </div>
+		        </div>
+		    </div>
+	    </div>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Degradation Year</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="degradationYearLayer" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+            <div class="description">
+                <p>
+                The degradation year is the year when the forest cover has been degraded for the first time.
+                </p>
+                <div class=legend_gradient>
+                <div class=gradient_item><div class=gradient_label>1982</div> 
+                    <div class=gradient_color style=background-color:rgb(40,146,199)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(45,148,196)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(58,151,194)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(75,155,189)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(70,157,188)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(87,159,186)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(92,161,184)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(105,168,179)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(120,173,173)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(130,179,166)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(141,184,162)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(153,191,157)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(164,196,151)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(177,204,147)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(187,209,138)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(199,217,134)></div> </div><div class=gradient_item>
+                    <div class=gradient_color style=background-color:rgb(210,224,128)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(219,230,122)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(227,235,115)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(238,242,107)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(250,250,100)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(250,237,95)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,225,88)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,213,83)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,200,78)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,189,71)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,175,66)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(252,160,61)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(250,149,55)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(250,137,50)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(247,124,47)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(247,114,42)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(245,99,37)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(242,86,34)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(240,71,29)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(237,58,26)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(235,41,23)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(232,16,20)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(208,9,9)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(179,8,0)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(140,8,0)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(120,8,0)></div> </div><div class=gradient_item> 
+                    <div class=gradient_color style=background-color:rgb(80,8,0)></div> 
+                    <div class=gradient_label>2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Deforestation Year</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="deforestationYearLayer" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+            <div class="description">
+                <p>
+		T       he deforestation year is the year when the forest cover has been deforested for the first time (followed or not by a regrowth).
+                </p>
+                <div class=legend_gradient>
+                    <div class="gradient_item"><div class="gradient_label">1982 </div> <div class="gradient_color" style="background-color: rgb(40, 146, 199);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(45, 148, 196);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(58, 151, 194);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(75, 155, 189);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(70, 157, 188);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(87, 159, 186);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(92, 161, 184);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(105, 168, 179);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(120, 173, 173);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(130, 179, 166);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(141, 184, 162);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(153, 191, 157);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(164, 196, 151);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(177, 204, 147);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(187, 209, 138);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(199, 217, 134);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(210, 224, 128);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(219, 230, 122);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(227, 235, 115);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(238, 242, 107);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(250, 250, 100);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(250, 237, 95);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 225, 88);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 213, 83);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 200, 78);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 189, 71);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 175, 66);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(252, 160, 61);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(250, 149, 55);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(250, 137, 50);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(247, 124, 47);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(247, 114, 42);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(245, 99, 37);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(242, 86, 34);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(240, 71, 29);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(237, 58, 26);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(235, 41, 23);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(232, 16, 20);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(208, 9, 9);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(179, 8, 0);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(140, 8, 0);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(120, 8, 0);"></div> <!----></div>
+                    <div class="gradient_item"><!----> <div class="gradient_color" style="background-color: rgb(80, 8, 0);"></div> 
+                    <div class="gradient_label">2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Annual Change Collection (1990-2024)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="AnnualChange_" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+            <div class="description">
+                <p>
+                The annual change collection depicts the TMF extent and the related disturbances (deforestation and degradation), 
+                and post-disturbances for each year between 1990 and 2024. 
+                The timeline allows seeing how the TMF is changing over the past 3 decades.
+                </p>
+                <div class="legend">
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,90,0);"></div> <div class="legend_label"> Undisturbed tropical moist forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(100,155,35);"></div> <div class="legend_label"> Degraded tropical moist forest</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,135,15);"></div> <div class="legend_label"> Deforested land</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(210,250,60);"></div> <div class="legend_label"> Forest regrowth</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(0,140,190);"></div> <div class="legend_label"> Permanent and seasonal water</div></div>
+                    <div class=legend_item><div class=legend_color style=background-color:rgb(255,255,255);"></div> <div class="legend_label"> Other land cover</div></div></div>
+                    </div>
+                </div>
+	  <section id="timeline" class="overlay_card" style="background: white;">
+		<div class="line-container">
+				<div class="year-item"><div class="dot"></div> <span class="year">1990</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1991</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1992</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1993</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1994</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1995</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1996</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1997</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1998</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">1999</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2000</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2001</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2002</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2003</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2004</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2005</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2006</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2007</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2008</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2009</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2010</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2011</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2012</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2013</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2014</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2015</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2016</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2017</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2018</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2019</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2020</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2021</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2022</span></div>
+				<div class="year-item"><div class="dot"></div> <span class="year">2023</span></div>
+				<div class="year-item active"><div class="dot"></div> <span class="year">2024</span></div>
+				<div class="line"></div>
+ 				 	</div>
+				</section>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Global Forest Cover 2020 V1</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="gfc2020_v1" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+            <div class="description">
+                <p>        		
+				The EC JRC global map of forest cover provides a spatially explicit representation of forest presence and absence for the year 2020 at 10m spatial resolution.
+				The year 2020 corresponds to the cut-off date of the Regulation from the European Union 'on the making available on the Union market and the export from the Union of certain commodities and products associated with deforestation and forest degradation' (EUDR, Regulation (EU) 2023/1115). In the context of the EUDR, the global forest cover map can be used as a non-mandatory, non-exclusive, and not legally binding source of information. Further information about the map and its use can be found on the EU Observatory on Deforestation and Forest Degradation (EUFO) in the section on Frequently Asked Questions.
+				Forest means land spanning more than 0.5 hectares with trees higher than 5 meters and a canopy cover of more than 10%, or trees able to reach those thresholds in situ, excluding land that is predominantly under agricultural or urban land use. Agricultural use means the use of land for the purpose of agriculture, including for agricultural plantations (i.e. tree stands in agricultural production systems such as fruit tree plantations, oil palm plantations, olive orchards and agroforestry systems) and set-aside agricultural areas, and for rearing livestock. All plantations of relevant commodities other than wood, that is cattle, cocoa, coffee, oil palm, rubber, soya, are excluded from the forest definition.
+				The global map of forest cover was created by combining available global datasets (wall-to-wall or global in their scope) on tree cover, tree height, land cover and land use into a single harmonized globally-consistent representation of where forests existed in 2020.
+				The workflow consisted in first mapping the global maximum extent of tree cover circa the year 2020 from the combination of ESA World Cover 2020 and 2021, WRI Tropical Tree Cover 2020, UMD Global land cover and land use 2019, Global Mangrove Watch 2020, and JRC Tropical Moist Forest 2020 datasets. In the second step, a series of overlays and decision rules were applied to reduce this maximum extent of tree cover and align it with the Forest definition using datasets covering cropland and commodity expansion (ESA World Cereal, UMD Global land cover and land use 2019, UMD Global Cropland Expansion, High-resolution global map of smallholder and industrial oil palm plantations, and WRI Spatial Database of Planted Trees), land use change (UMD global forest cover loss, JRC Tropical Moist Forest, IIASA Global Forest Management), built-up (JRC Global Human Settlement), and water (JRC Global Surface Water).
+				The detailed mapping approach will be described in a separate technical report expected to be released by March 2024. The accuracy of this map has not been yet assessed but will be reported as soon as available.
+				Please also refer to the list of known issues and to the JRC Data Catalogue entry.
+                </p>
+				    <div class="legend">
+					    <div class=legend_item><div class=legend_color style=background-color:rgb(0,90,0)></div> <div class=legend_label>Undisturbed tropical moist forest</div>
+				    </div>
+			    </div>
+		    </div>
+	    </div>
+        <div class="layer">
+            <div class="layer-row">
+            <span class="title">Global Forest Cover 2020 V2</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="gfc2020_v2" />
+                <span class="slider"></span>
+            </label>
+            <div class="anchors">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            </div>
+            <div class="info">
+				<div class="description">
+					<p>        		
+					The EC JRC global map of forest cover provides a spatially explicit representation of forest presence and absence for the year 2020 at 10m spatial resolution.
+					The year 2020 corresponds to the cut-off date of the Regulation from the European Union 'on the making available on the Union market and the export from the Union of certain commodities and products associated with deforestation and forest degradation' (EUDR, Regulation (EU) 2023/1115). In the context of the EUDR, the global forest cover map can be used as a non-mandatory, non-exclusive, and not legally binding source of information. Further information about the map and its use can be found on the EU Observatory on Deforestation and Forest Degradation (EUFO) in the section on Frequently Asked Questions.
+					Forest means land spanning more than 0.5 hectares with trees higher than 5 meters and a canopy cover of more than 10%, or trees able to reach those thresholds in situ, excluding land that is predominantly under agricultural or urban land use. Agricultural use means the use of land for the purpose of agriculture, including for agricultural plantations (i.e. tree stands in agricultural production systems such as fruit tree plantations, oil palm plantations, olive orchards and agroforestry systems) and set-aside agricultural areas, and for rearing livestock. All plantations of relevant commodities other than wood, that is cattle, cocoa, coffee, oil palm, rubber, soya, are excluded from the forest definition.
+					The global map of forest cover was created by combining available global datasets (wall-to-wall or global in their scope) on tree cover, tree height, land cover and land use into a single harmonized globally-consistent representation of where forests existed in 2020.
+					The workflow consisted in first mapping the global maximum extent of tree cover circa the year 2020 from the combination of ESA World Cover 2020 and 2021, WRI Tropical Tree Cover 2020, UMD Global land cover and land use 2019, Global Mangrove Watch 2020, and JRC Tropical Moist Forest 2020 datasets. In the second step, a series of overlays and decision rules were applied to reduce this maximum extent of tree cover and align it with the Forest definition using datasets covering cropland and commodity expansion (ESA World Cereal, UMD Global land cover and land use 2019, UMD Global Cropland Expansion, High-resolution global map of smallholder and industrial oil palm plantations, and WRI Spatial Database of Planted Trees), land use change (UMD global forest cover loss, JRC Tropical Moist Forest, IIASA Global Forest Management), built-up (JRC Global Human Settlement), and water (JRC Global Surface Water).
+					The detailed mapping approach will be described in a separate technical report expected to be released by March 2024. The accuracy of this map has not been yet assessed but will be reported as soon as available.
+					Please also refer to the list of known issues and to the JRC Data Catalogue entry.
+					</p>
+					<div class="legend">
+						<div class=legend_item><div class=legend_color style=background-color:rgb(0,90,0)></div> <div class=legend_label>Undisturbed tropical moist forest</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="layer">
+			<div class="layer-row">
+			<span class="title">Kawasan Hutan 2021</span>
+			<label class="toggle-switch">
+				<input type="checkbox" id="Kawasan Hutan 2021" />
+				<span class="slider"></span>
+			</label>
+			<div class="anchors">
+				<i class="fas fa-info-circle"></i>
+			</div>
+			</div>
+			<div class="info">
+			<div class="description">
+					<p>        		
+					Merupakan layer Peta kawasan hutan yang memuat Peta penunjukan kawasan hutan, Peta Perubahan Peruntukan, 
+					Perubahan Fungsi Kawasan Hutan dan Penunjukan bukan Kawasan Hutan menjadi Kawasan Hutan (review RTRW) hingga Peta Perkembangan Pengukuhan Kawasan Hutan, dengan tipe data polygon.
+					Dasar : -Peraturan Menteri Lingkungan Hidup Dan Kehutanan Republik Indonesia Nomor 7 Tahun 2021 Tentang Perencanaan Kehutanan, 
+					Perubahan Peruntukan Kawasan Hutan Dan Perubahan Fungsi Kawasan Hutan, Serta Penggunaan Kawasan Hutan.
+					</p>
+					<div class="legend">
+						<div class="legend">
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(173, 63, 255, 1);"></div><div class="legend_label">Kawasan Konservasi</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(0,0,0,0); border: 2px solid rgba(197, 0, 255, 1);"></div><div class="legend_label">Kawasan Konservasi Laut</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(76, 230, 0, 1);"></div><div class="legend_label">Hutan Lindung</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 255, 115, 1);"></div><div class="legend_label">Hutan Produksi Tetap</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(163, 255, 115, 1);"></div><div class="legend_label">Hutan Produksi Terbatas</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(245, 122, 122, 1);"></div><div class="legend_label">Hutan Produksi yang dapat di Konversi</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 255, 255, 1);"></div><div class="legend_label">Area Penggunaan Lain</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 197, 255, 1);"></div><div class="legend_label">Tubuh Air</div></div>
+							<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 0, 0, 1);"></div><div class="legend_label">Tidak Terdefinisi</div></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="layer">
+			<div class="layer-row">
+			<span class="title">PIPPIB 2025</span>
+			<label class="toggle-switch">
+				<input type="checkbox" id="PIPPIB 2025" />
+				<span class="slider"></span>
+			</label>
+			<div class="anchors">
+				<i class="fas fa-info-circle"></i>
+			</div>
+			</div>
+			<div class="info">
+			<div class="description">
+					<p>        		
+						Peta ini merupakan tindak lanjut dari Instruksi Presiden Nomor 5 Tahun 2019 tentang Penghentian Pemberian Izin Baru dan Penyempurnaan Tata Kelola Hutan Alam Primer dan Lahan Gambut. 
+						Sesuai Inpres Nomor 5 Tahun 2019 tentang Penghentian Pemberian Izin Baru dan Penyempurnaan Tata Kelola Hutan Alam Primer dan Lahan Gambut Amar Ketiga mengamanatkan kepada Menteri 
+						Lingkungan Hidup dan Kehutanan untuk melakukan revisi (pemutakhiran) dan menetapkan Peta Indikatif Penghentian Pemberian Izin Baru Hutan Alam Primer dan Lahan Gambut setiap enam bulan. 
+						Sebagai tindak lanjut telah terbit Surat Tugas Nomor: ST.51/MENLHK/PKTL/PLA.1/8/2019 tanggal 22 Agustus 2019 oleh Menteri Lingkungan Hidup dan Kehutanan kepada Direktur Jenderal Planologi Kehutanan dan Tata Lingkungan, 
+						Dilaksanakan Penetapan Peta Indikatif Penghentian Pemberian Izin Baru Hutan Alam Primer dan Lahan Gambut sebagai pelimpahan wewenang Menteri dalam Instruksi Presiden Kepada Eselon I yang menangani, maka segera dilakukan pengesahan Peta Indikatif Penghentian Pemberian Perizinan Berusaha, 
+						Persetujuan Penggunaan Kawasan Hutan, atau Perubahan Peruntukan Kawasan Hutan Baru pada Hutan Alam Primer dan Lahan Gambut (PIPPIB). Data penyusun peta menggunakan data spasial yang telah lolos kontrol kualitas melalui Jaringan Informasi Geospasial Lingkungan Hidup dan Kehutanan per Desember 2023. 
+						Penyusunan PIPPIB Tahun 2025 telah melalui pembahasan dengan Kementerian dan Lembaga terkait yang dilakukan tahun 2024. Penetapan PIPPIB Tahun 2025 berdasarkan Keputusan Menteri Kehutanan Nomor 554 Tahun 2025 tanggal 17 Februari 2025.Hasil Penjaminan Kualitas 
+						:Berdasarkan proses QA IGT kualitas data dan kelengkapan metadata maka IGT  Perizinan Berusaha, Persetujuan Penggunaan Kawasan Hutan , Persetujuan Pelepasan Kawasan Hutan untuk Perubahan Peruntukan Kawasan Hutan pada areal Hutan Alam Primer dan Lahan Gambut mendapatkan rata-rata nilai 99,375 dan metadata lengkap. 
+						Berdasarkan penilaian tersebut maka IGT masuk dalam kategori B. 
+					</p>
+					<div class="legend">
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 127, 127, 1);"></div><div class="legend_label">PIPPIB GAMBUT</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 168, 132, 1);"></div><div class="legend_label">PIPPIB KAWASAN</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 168, 132, 1);"></div><div class="legend_label">PIPPIB PRIMER</div></div>
+					</div>
+				</div>
+			</div>
+			<div class="layer">
+				<div class="layer-row">
+				<span class="title">Penutupan Lahan 2020</span>
+				<label class="toggle-switch">
+					<input type="checkbox" id="Penutupan Lahan 2020" />
+					<span class="slider"></span>
+				</label>
+				<div class="anchors">
+					<i class="fas fa-info-circle"></i>
+				</div>
+				</div>
+				<div class="info">
+				<div class="description">
+					<p>        		
+						Peta penutupan lahan tahun 2020 adalah hasil update peta penutupan lahan tahun 2019 dengan menggunakan mosaik citra landsat tahun 2020 (akuisisi citra landsat pada periode Juli 2019 sampai dengan Juni 2020). 
+						Penutupan Lahan dikelaskan ke dalam 23 kelas penutupan lahan sesuai dengan Peraturan Direktur Jenderal Planologi Kehutanan Nomor P.1/VII-IPSDH/2015 tentang 
+						Pedoman Pemantauan Penutupan Lahan.Dasar :Peraturan Menteri Lingkungan Hidup dan Kehutanan Nomor7 Tahun 2021 tentang Perencanaan Kehutanan, 
+						Perubahan Peruntukan Kawasan Hutan dan Perubahan Fungsi Kawasan Hutan, serta Penggunaan Kawasan.
+					</p>
+					<div class="legend">
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(96, 230, 99, 1);"></div><div class="legend_label">Hutan Lahan Kering Primer</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(114, 255, 0, 1);"></div><div class="legend_label">Hutan Lahan Kering Sekunder</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(142, 167, 4, 1);"></div><div class="legend_label">Hutan Mangrove Primer</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(193, 167, 0, 1);"></div><div class="legend_label">Hutan Mangrove Sekunder</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(235, 192, 167, 1);"></div><div class="legend_label">Semak/Belukar</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(213, 255, 2, 1);"></div><div class="legend_label">Savana</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(211, 229, 152, 1);"></div><div class="legend_label">Hutan Tanaman Industri ( HTI )</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(229, 210, 152, 1);"></div><div class="legend_label">Perkebunan</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(246, 254, 167, 1);"></div><div class="legend_label">Pertanian Lahan Kering</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(237, 245, 0, 1);"></div><div class="legend_label">Pertanian Lahan Kering Bercampur dgn Semak</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(114, 142, 167, 1);"></div><div class="legend_label">Transmigrasi; Transmigrasi</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(168, 214, 255, 1);"></div><div class="legend_label">Sawah</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(124, 244, 244, 1);"></div><div class="legend_label">Tambak</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(214, 0, 115, 1);"></div><div class="legend_label">Tanah Terbuka</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(167, 4, 0, 1);"></div><div class="legend_label">Pertambangan</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(78, 78, 78, 1);"></div><div class="legend_label">Permukiman</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(212, 252, 247, 1);"></div><div class="legend_label">Tubuh Air</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(214, 0, 115, 1);"></div><div class="legend_label">Pelabuhan Udara/Laut</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(209, 209, 209, 1);"></div><div class="legend_label">Awan</div></div>
+					</div>
+				</div>
+			</div>
+		<div class="layer">
+			<div class="layer-row">
+			<span class="title">Penutupan Lahan 2024</span>
+			<label class="toggle-switch">
+				<input type="checkbox" id="Penutupan Lahan 2024" />
+				<span class="slider"></span>
+			</label>
+			<div class="anchors">
+				<i class="fas fa-info-circle"></i>
+			</div>
+			</div>
+			<div class="info">
+			<div class="description">
+					<p>        		
+						IGT Penutupan Lahan Kawasan Hutan tahun 2024 skala 1:250.000 adalah hasil update peta IGT Penutupan Lahan Kawasan Hutan tahun 2023 dengan menggunakan mosaik citra landsat tahun 2024 (akuisisi citra landsat pada periode Januari s.d Desember 2024). 
+						Penutupan Lahan dikelaskan ke dalam 23 kelas penutupan lahan sesuai dengan Peraturan Direktur Jenderal Planologi Kehutanan Nomor P.1/VII-IPSDH/2015 tentang 
+						Pedoman Pemantauan Penutupan Lahan. Dasar Peraturan : Peraturan Menteri Lingkungan Hidup dan Kehutanan Nomor 7 Tahun 2021 tentang Perencanaan Kehutanan, Perubahan Peruntukan Kawasan Hutan dan Perubahan Fungsi Kawasan Hutan, serta Penggunaan Kawasan.
+						Hasil Penjaminan Kualitas :Berdasarkan proses QA IGT kualitas data dan kelengkapan metadata maka IGT Penutupan Lahan Kawasan Hutan Tahun 2024 mendapatkan rata-rata nilai 100,00 dan metadata lengkap. Berdasarkan penilaian tersebut maka IGT masuk dalam kategori A.
+					</p>
+					<div class="legend">
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(96, 230, 99, 1);"></div><div class="legend_label">Hutan Lahan Kering Primer</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(114, 255, 0, 1);"></div><div class="legend_label">Hutan Lahan Kering Sekunder</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(142, 167, 4, 1);"></div><div class="legend_label">Hutan Mangrove Primer</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(193, 167, 0, 1);"></div><div class="legend_label">Hutan Mangrove Sekunder</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(235, 192, 167, 1);"></div><div class="legend_label">Semak/Belukar</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(213, 255, 2, 1);"></div><div class="legend_label">Savana</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(211, 229, 152, 1);"></div><div class="legend_label">Hutan Tanaman Industri ( HTI )</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(229, 210, 152, 1);"></div><div class="legend_label">Perkebunan</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(246, 254, 167, 1);"></div><div class="legend_label">Pertanian Lahan Kering</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(237, 245, 0, 1);"></div><div class="legend_label">Pertanian Lahan Kering Bercampur dgn Semak</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(114, 142, 167, 1);"></div><div class="legend_label">Transmigrasi; Transmigrasi</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(168, 214, 255, 1);"></div><div class="legend_label">Sawah</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(124, 244, 244, 1);"></div><div class="legend_label">Tambak</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(214, 0, 115, 1);"></div><div class="legend_label">Tanah Terbuka</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(167, 4, 0, 1);"></div><div class="legend_label">Pertambangan</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(78, 78, 78, 1);"></div><div class="legend_label">Permukiman</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(212, 252, 247, 1);"></div><div class="legend_label">Tubuh Air</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(214, 0, 115, 1);"></div><div class="legend_label">Pelabuhan Udara/Laut</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(209, 209, 209, 1);"></div><div class="legend_label">Awan</div></div>
+					</div>
+				</div>
+			</div>
+		<div class="layer">
+			<div class="layer-row">
+			<span class="title">Mangrove 2024</span>
+			<label class="toggle-switch">
+				<input type="checkbox" id="Mangrove 2024" />
+				<span class="slider"></span>
+			</label>
+			<div class="anchors">
+				<i class="fas fa-info-circle"></i>
+			</div>
+			</div>
+			<div class="info">
+			<div class="description">
+					<p>        		
+						IGT Penutupan Lahan Kawasan Hutan tahun 2024 skala 1:250.000 adalah hasil update peta IGT Penutupan Lahan Kawasan Hutan tahun 2023 dengan menggunakan mosaik citra landsat tahun 2024 (akuisisi citra landsat pada periode Januari s.d Desember 2024). 
+						Penutupan Lahan dikelaskan ke dalam 23 kelas penutupan lahan sesuai dengan Peraturan Direktur Jenderal Planologi Kehutanan Nomor P.1/VII-IPSDH/2015 tentang 
+						Pedoman Pemantauan Penutupan Lahan. Dasar Peraturan : Peraturan Menteri Lingkungan Hidup dan Kehutanan Nomor 7 Tahun 2021 tentang Perencanaan Kehutanan, Perubahan Peruntukan Kawasan Hutan dan Perubahan Fungsi Kawasan Hutan, serta Penggunaan Kawasan.
+						Hasil Penjaminan Kualitas :Berdasarkan proses QA IGT kualitas data dan kelengkapan metadata maka IGT Penutupan Lahan Kawasan Hutan Tahun 2024 mendapatkan rata-rata nilai 100,00 dan metadata lengkap. Berdasarkan penilaian tersebut maka IGT masuk dalam kategori A.
+					</p>
+					<div class="legend">
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 0, 0, 0); border: 1px solid #000000;"><img src="Data/image/MANGROVE JARANG.png" alt="MANGROVE JARANG" /></div><div class="legend_label">MANGROVE JARANG</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 0, 0, 0); border: 1px solid #000000;"><img src="Data/image/MANGROVE SEDANG.png" alt="MANGROVE SEDANG" /></div><div class="legend_label">MANGROVE SEDANG</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 0, 0, 0); border: 1px solid #000000;"><img src="Data/image/MANGROVE LEBAT.png" alt="MANGROVE LEBAT" /></div><div class="legend_label">MANGROVE LEBAT</div></div>
+					</div>
+				</div>
+			</div>
+		<div class="layer">
+			<div class="layer-row">
+			<span class="title">Kawasan Hutan 2024"</span>
+			<label class="toggle-switch">
+				<input type="checkbox" id="Kawasan Hutan 2024" />
+				<span class="slider"></span>
+			</label>
+			<div class="anchors">
+				<i class="fas fa-info-circle"></i>
+			</div>
+			</div>
+			<div class="info">
+			<div class="description">
+					<p>        		
+						IGT Kawasan Hutan skala 1 : 250.000 wilayah Indonesia pemutakhiran Juli 2024, produsen data Direktorat Pengukuhan dan Penatagunaan Kawasan Hutan, 
+						Kementerian Lingkungan Hidup dan Kehutanan; adalah Peta Pengukuhan Kawasan Hutan yang sumbernya terdiri dari proses Penunjukan Kawasan Hutan, Perubahan Peruntukan, Perubahan Fungsi Kawasan Hutan, 
+						Penunjukan bukan Kawasan Hutan menjadi Kawasan Hutan (review RTRW) serta Peta Perkembangan Pengukuhan Kawasan Hutan, 
+						Penyelesaian Penguasaan Tanah dalam rangka Penataan Kawasan Hutan (SK Perubahan Batas Tora) dan Hasil Tata Batas Kawasan Hutan yang dilaksanankan oleh 
+						UPT Balai Pemantapan Kawasan Hutan dan Tata Lingkungan wilayah I s/d XXII disahkan oleh Ditjen PKTL Cq MenLHK, Pemetaan Kawasan Hutan dan Penetapan Kawasan Hutan guna ditetapkan oleh Pemerintah untuk dipertahankan keberadaannya sebagai Hutan tetap. 
+						Sumber data kronologis kawasan hutan yang di kompilasi menjadi IGT Kawasan Hutan dari berbagai tahun ada yang semenjak penjajahan belanda hingga saat ini data peta termutakhir pada tiap wilayah Provinsi di Indonesia. Hasil Penjaminan Kualitas :
+						Berdasarkan proses QA IGT kualitas data dan kelengkapan metadata maka IGT Kawasan Hutan mendapatkan rata-rata nilai 99 dan metadata lengkap. 
+						Berdasarkan penilaian tersebut maka IGT masuk dalam kategori B
+					</p>
+					<div class="legend">
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(173, 63, 255, 1);"></div><div class="legend_label">Kawasan Konservasi</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0,0,0,0); border: 2px solid rgba(197, 0, 255, 1);"></div><div class="legend_label">Kawasan Konservasi Laut</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(76, 230, 0, 1);"></div><div class="legend_label">Hutan Lindung</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 255, 115, 1);"></div><div class="legend_label">Hutan Produksi Tetap</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(163, 255, 115, 1);"></div><div class="legend_label">Hutan Produksi Terbatas</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(245, 122, 122, 1);"></div><div class="legend_label">Hutan Produksi yang dapat di Konversi</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 255, 255, 1);"></div><div class="legend_label">Area Penggunaan Lain</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(0, 197, 255, 1);"></div><div class="legend_label">Tubuh Air</div></div>
+						<div class="legend_item"><div class="legend_color" style="background-color: rgba(255, 0, 0, 1);"></div><div class="legend_label">Tidak Terdefinisi</div></div>
+					</div>
+				</div>
+			</div>			
+
+    
+	<script>
+		
+		var mymap = L.map('mapdiv', {
+		    center: [0.10229460235509212, 123.72772399675715],
+		    zoom: 5,
+		    attributionControl: true,
+		    zoomControl: false
+		});
+
+
+        var GoogleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom: 23,subdomains:['mt0','mt1','mt2','mt3'],attribution: '&copy; Google Maps'});
+		var OpenStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 23,attribution: '&copy; OpenStreetMap contributors'});
+		var EsriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'});
+		var EsriWorldImagery_minimap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'});
+		var EsriNatGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ'});
+		var EsriWorldTerrain = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; USGS, Esri, TANA, DeLorme, and NPS'});
+		var EsriWorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; Source: Esri, NAVTEQ, DeLorme'});
+		var WorldDarkGrayBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'});
+		var WorldLightGrayBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom: 23,attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'});
+		var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {maxZoom: 23,attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)'});
+
+		// Tambahkan salah satu base map ke peta saat awal dimuat
+		GoogleStreets.addTo(mymap);	
+
+		// Layer WMS Public JRC API
+		var UndisturbedDegradedForestLayer = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+			layers: 'UndisturbedDegradedForest',
+			format: 'image/png',
+			transparent: true,
+			attribution: 'Data &copy; Joint Research Centre TMF'
+		});
+
+		var TransitionMap_SubtypesLayer = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+			layers: 'TransitionMap_Subtypes',
+			format: 'image/png',
+			transparent: true,
+			attribution: 'Data &copy; Joint Research Centre TMF'
+		});
+
+		var TransitionMapHybrid_SubtypesLayer = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+			layers: 'TransitionMapHybrid_Subtypes',
+			format: 'image/png',
+			transparent: true,
+			attribution: 'Data &copy; Joint Research Centre TMF'
+		});
+
+		var degradationYearLayer = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+			layers: 'DegradationYear',
+			format: 'image/png',
+			transparent: true,
+			attribution: 'Data &copy; Joint Research Centre TMF'
+		});
+
+		var deforestationYearLayer = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+			layers: 'DeforestationYear',
+			format: 'image/png',
+			transparent: true,
+			attribution: 'Data &copy; Joint Research Centre TMF'
+		});
+
+		var AnnualChangeLayers = {};
+		for (var year = 1990; year <= 2024; year++) {
+			AnnualChangeLayers[year] = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/wms.py?', {
+				layers: 'AnnualChange_' + year,
+				format: 'image/png',
+				transparent: true,
+				attribution: 'Data &copy; Joint Research Centre TMF'
+			});
+		}
+
+		// layer WMS untuk Global Forest Cover 2020 v1 dan v2
+		var gfc2020_v1 = L.tileLayer.wms('https://ies-ows.jrc.ec.europa.eu/iforce/gfc2020/wms.py?', {
+			layers: 'gfc2020_v1',
+			format: 'image/png',
+			transparent: true,
+			attribution: "Data &copy; Joint Research Centre TMF"
+		});
+
+		var gfc2020_v2 = L.tileLayer('https://ies-ows.jrc.ec.europa.eu/iforce/gfc2020/wms.py?', {
+			layers: 'gfc2020_v2',
+			format: 'image/png',
+			transparent: true,
+			attribution: "Data &copy; Joint Research Centre TMF"
+		});
+
+		// Layer-layer overlay dari SIGAP Interaktif KLHK
+		var kawasanHutan = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/SIGAP_Interaktif/Kawasan_Hutan/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		// "Kawasan Hutan 2024"
+		var pippibLayer = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/dbjvcbsyfs/PIPPIB_AR_250K/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		// "Penutupan Lahan 2020"
+		var penutupanLahan2020 = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/SIGAP_Interaktif/Penutupan_Lahan_2020/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		// "Penutupan Lahan 2024"
+		var plLayer = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/dunekalks/PL_AR_250K/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		// "Mangrove 2024"
+		var mangroveLayer = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/aftjdcsvjvs/MANGROVE_AR_25K/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		// "Kawasan Hutan 2024"
+		var kawasanHutanLayer = L.tileLayer('https://geoportal.menlhk.go.id/server/rest/services/jsdgejawfvrdtasdt/KWS_HUTAN/MapServer/tile/{z}/{y}/{x}', {
+			attribution: '© KLHK',
+			maxZoom: 20
+		});
+
+		//Daftar Basemaps
+		basemaps = {
+			"Google Streets": GoogleStreets,
+			"Open Street Map": OpenStreetMap,
+			"Esri World Imagery": EsriWorldImagery,
+			"Esri NatGeo World Map": EsriNatGeoWorldMap,
+			"Esri World Terrain" : EsriWorldTerrain,
+			"Esri World Street Map" : EsriWorldStreetMap,
+			"World Dark Gray Base" : WorldDarkGrayBase,
+			"World Light Gray Base" : WorldLightGrayBase,
+			"Open Topo Map": OpenTopoMap
+			};
+
+		// Daftar semua layers
+		var overlays = {
+			"UndisturbedDegradedForestLayer": UndisturbedDegradedForestLayer,
+			"TransitionMap_SubtypesLayer": TransitionMap_SubtypesLayer,
+			"TransitionMapHybrid_SubtypesLayer": TransitionMapHybrid_SubtypesLayer,
+			"degradationYearLayer": degradationYearLayer,
+			"deforestationYearLayer": deforestationYearLayer,
+			"gfc2020_v1": gfc2020_v1,
+			"gfc2020_v2": gfc2020_v2,
+			"Kawasan Hutan 2021": kawasanHutan,
+			"PIPPIB 2025": pippibLayer,
+			"Penutupan Lahan 2020": penutupanLahan2020,
+			"Penutupan Lahan 2024": plLayer,
+			"Mangrove 2024": mangroveLayer,
+			"Kawasan Hutan 2024": kawasanHutanLayer
+			};
+
+
+		// Tambahkan AnnualChangeLayers ke overlays satu per satu
+		for (var year in AnnualChangeLayers) {
+			overlays["Annual Change " + year] = AnnualChangeLayers[year];
+		}
+
+		// Layer Control
+		L.control.layers(basemaps,null, { position: 'bottomleft' }).addTo(mymap);
+
+		// Fungsi untuk toggle layer berdasarkan checkbox
+		function toggleLayer(id, mapInstance) {
+		const checkbox = document.getElementById(id);
+		const layer = overlays[id];
+
+		if (checkbox && layer) {
+			if (checkbox.checked) {
+			layer.addTo(mapInstance);
+			} else {
+			mapInstance.removeLayer(layer);
+			}
+		}}
+
+		// Pasang event listener untuk semua checkbox
+		Object.keys(overlays).forEach(id => {
+		const checkbox = document.getElementById(id);
+		if (checkbox) {
+			checkbox.addEventListener('change', function () {
+			toggleLayer(id, mymap);
+			});
+		}});
+
+		// Toggle info box saat ikon info diklik
+		document.querySelectorAll('.anchors').forEach(anchor => {
+		anchor.addEventListener('click', function () {
+			const infoBox = this.closest('.layer').querySelector('.info');
+			infoBox.style.display = infoBox.style.display === 'block' ? 'none' : 'block';
+		});
+		});
+
+		// Jaga agar overlay tetap ada saat ganti basemap
+		mymap.on('baselayerchange', function () {
+		setTimeout(() => {
+			Object.keys(overlays).forEach(id => {
+			const checkbox = document.getElementById(id);
+			const layer = overlays[id];
+
+			if (checkbox && checkbox.checked) {
+				if (!mymap.hasLayer(layer)) {
+				layer.addTo(mymap);
+				}
+				// Pastikan overlay selalu di atas basemap
+				if (layer.bringToFront) {
+				layer.bringToFront();
+				}
+			}
+			});
+		}, 100); // delay agar basemap selesai diproses
+		});
+
+		// Set active tahun dan scroll ke tengah
+		document.querySelectorAll('.anchors').forEach(function(anchor) {
+		anchor.addEventListener('click', function() {
+			const layer = this.parentElement;
+			layer.classList.toggle('active');
+		});
+		});
+
+		// Toggle Sidebar
+		const toggleBtn = document.getElementById('toggleSidebar');
+		const sidebar = document.getElementById('sidebar');
+
+		toggleBtn.addEventListener('click', function() {
+		sidebar.classList.toggle('hidden');
+		});
+		// Time Series AnnualChange Layer
+		let currentAnnualLayer = null;
+		const checkbox = document.getElementById('AnnualChange_');
+
+		checkbox.addEventListener('change', function () {
+		if (!this.checked && currentAnnualLayer) {
+			mymap.removeLayer(currentAnnualLayer);
+			currentAnnualLayer = null;
+		}
+		});
+
+		document.querySelectorAll('#timeline .year-item').forEach(function (item) {
+		item.addEventListener('click', function () {
+		// Ambil tahun dari elemen yang diklik
+		const year = parseInt(this.querySelector('.year').textContent);
+
+		// Hapus layer lama jika ada
+		if (currentAnnualLayer) {
+		mymap.removeLayer(currentAnnualLayer);
+		}
+
+		// Tambahkan layer baru jika checkbox aktif
+		if (checkbox.checked) {
+		currentAnnualLayer = AnnualChangeLayers[year];
+		mymap.addLayer(currentAnnualLayer);
+		}
+
+    	// Highlight tahun aktif di UI
+		document.querySelectorAll('#timeline .year-item').forEach(el => el.classList.remove('active'));
+		this.classList.add('active');
+		});
+		});
+
+
+		// Tambahkan ini setelah Time Series blok di atas
+		mymap.on('baselayerchange', function () {
+		setTimeout(() => {
+			console.log("Basemap changed");
+
+			// Tambahkan kembali currentAnnualLayer jika masih aktif
+			const annualCheckbox = document.getElementById('AnnualChange_');
+			if (annualCheckbox && annualCheckbox.checked && currentAnnualLayer) {
+			console.log("Menambahkan ulang currentAnnualLayer");
+			// Pastikan currentAnnualLayer ditambahkan kembali
+			if (!mymap.hasLayer(currentAnnualLayer)) {
+				currentAnnualLayer.addTo(mymap);
+			}
+			// Pastikan currentAnnualLayer berada di depan
+			currentAnnualLayer.bringToFront();
+			}
+
+		}, 200);
+		});
+
+
+
+		// Fungsi untuk memuat file KML
+		 function loadKML(file) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                var kmlData = e.target.result;
+
+                // Menggunakan omnivore untuk memuat KML
+                var kmlLayer = omnivore.kml.parse(kmlData);
+
+                // Menambahkan layer KML ke peta
+                kmlLayer.addTo(mymap);
+
+                // Zoom ke objek KML setelah dimuat
+                mymap.fitBounds(kmlLayer.getBounds());
+            };
+
+            // Membaca file KML sebagai teks
+            reader.readAsText(file);
+        }
+
+        // Fungsi untuk memuat file KMZ
+        function loadKMZ(file) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                var kmzData = e.target.result;
+
+                // Menggunakan JSZip untuk mengekstrak file KML dari KMZ
+                JSZip.loadAsync(kmzData).then(function(zip) {
+                    var kmlFile = zip.file(/\.kml$/i)[0]; // Ambil file KML pertama di dalam ZIP
+                    if (kmlFile) {
+                        kmlFile.async("text").then(function(kmlData) {
+                            // Gunakan omnivore untuk memuat KML
+                            var kmlLayer = omnivore.kml.parse(kmlData);
+
+                            // Menambahkan layer KML ke peta
+                            kmlLayer.addTo(mymap);
+
+                            // Zoom ke objek KML setelah dimuat
+                            mymap.fitBounds(kmlLayer.getBounds());
+                        });
+                    } else {
+                        alert('File KMZ tidak mengandung file KML yang valid.');
+                    }
+                });
+            };
+
+            // Membaca file KMZ sebagai binary string
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Menangani perubahan input file
+        document.getElementById('kml-file').addEventListener('change', function(event) {
+            var file = event.target.files[0];
+
+            // Jika tidak ada file yang dipilih, keluar
+            if (!file) return;
+
+            // Memeriksa apakah file yang dipilih adalah KML atau KMZ
+            if (file.name.endsWith('.kml')) {
+                loadKML(file);
+            } else if (file.name.endsWith('.kmz')) {
+                loadKMZ(file);
+            } else {
+                alert('Harap pilih file KML atau KMZ yang valid.');
+            }
+        });
+
+		// Custom Geocoder untuk cek koordinat langsung
+		var customGeocoder = {
+		geocode: function(query, cb) {
+		const parts = query.split(',');
+		if (parts.length === 2) {
+			const lat = parseFloat(parts[0].trim());
+			const lng = parseFloat(parts[1].trim());
+			if (!isNaN(lat) && !isNaN(lng)) {
+			return cb([{
+				name: `Koordinat: ${lat}, ${lng}`,
+				center: L.latLng(lat, lng),
+				bbox: L.latLngBounds(
+				[lat - 0.01, lng - 0.01],
+				[lat + 0.01, lng + 0.01]
+				)
+			}]);
+			}
+		}
+		// Kalau bukan koordinat, pakai Nominatim
+		L.Control.Geocoder.nominatim().geocode(query, cb);
+			}
+		};
+
+		// Tambahkan kontrol pencarian
+		geocoder = L.Control.geocoder({
+  		defaultMarkGeocode: false
+		})
+		.on('markgeocode', function(e) {
+		if (e.geocode && e.geocode.center) {
+			mymap.setView(e.geocode.center, 13);
+		} else {
+			console.log("Hasil pencarian tidak ditemukan");
+		}
+		})
+		.addTo(mymap);
+
+		// Ambil input box dari geocoder (manual injection)
+		setTimeout(() => {
+			const input = document.querySelector('.leaflet-control-geocoder-form input');
+
+			if (input) {
+			input.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter') {
+				const value = input.value.trim();
+				const parts = value.split(',');
+
+				if (parts.length === 2) {
+					const lat = parseFloat(parts[0]);
+					const lon = parseFloat(parts[1]);
+
+					if (!isNaN(lat) && !isNaN(lon)) {
+					const latlng = [lat, lon];
+					L.marker(latlng).addTo(mymap)
+						.bindPopup(`Koordinat: ${lat}, ${lon}`)
+						.openPopup();
+					mymap.setView(latlng, 13);
+					e.preventDefault(); // stop geocoder dari request ke Nominatim
+					}
+				}
+				}
+			});
+			}
+		}, 500);
+
+        //ZOOM CONTROL
+		L.control.zoom({position:'topright'}).addTo(mymap);
+
+        //MEASURE
+		L.control.polylineMeasure({position:'topright'}).addTo(mymap);
+
+        //MOUSE POSITION
+		L.control.mousePosition({position:'bottomright'}).addTo(mymap);
+
+		// Fungsi GetFeatureInfo URL
+		function getFeatureInfoUrl(layer, latlng, map) {
+		var point = map.latLngToContainerPoint(latlng, map.getZoom());
+		var size = map.getSize();
+
+		var params = {
+			request: 'GetFeatureInfo',
+			service: 'WMS',
+			srs: 'EPSG:4326',
+			styles: '',
+			transparent: true,
+			version: '1.1.1',
+			format: 'image/png',
+			bbox: map.getBounds().toBBoxString(),
+			height: size.y,
+			width: size.x,
+			layers: layer.wmsParams.layers,
+			query_layers: layer.wmsParams.layers,
+			info_format: 'application/json',
+			x: point.x,
+			y: point.y
+		};
+
+		return layer._url + L.Util.getParamString(params, layer._url, true);
+		}
+
+		// // Fungsi cek layer mana yang sedang aktif (ada di peta)
+		// function getActiveWmsLayer() {
+		// for (var name in wmsLayers) {
+		// 	if (mymap.hasLayer(wmsLayers[name])) {
+		// 	return wmsLayers[name]; // Ambil layer aktif pertama
+		// 	}
+		// }
+		// return null;
+		// }
+
+		// // Event klik pada peta
+		// mymap.on('click', function (e) {
+		// var activeLayer = getActiveWmsLayer();
+
+		// if (!activeLayer) {
+		// 	console.log("Tidak ada layer WMS aktif.");
+		// 	return;
+		// }
+
+		// var url = getFeatureInfoUrl(activeLayer, e.latlng, mymap);
+
+		// fetch(url)
+		// 	.then(response => response.json())
+		// 	.then(data => {
+		// 	var content = "<b>Tidak ada data ditemukan.</b>";
+
+		// 	if (data.features && data.features.length > 0) {
+		// 		var props = data.features[0].properties;
+		// 		content = `<table style="border-collapse: collapse; width: 100%; font-size: 12px;">
+		// 		<thead>
+		// 			<tr style="background-color: #23df31;">
+		// 			<th style="border: 1px solid #ddd; padding: 6px; text-align: center;">Atribute</th>
+		// 			<th style="border: 1px solid #ddd; padding: 6px; text-align: center;">Value</th>
+		// 			</tr>
+		// 		</thead>
+		// 		<tbody>`;
+
+		// 		for (var key in props) {
+		// 			content += `
+		// 			<tr>
+		// 			<td style="border: 1px solid #ddd; padding: 6px;">${key}</td>
+		// 			<td style="border: 1px solid #ddd; padding: 6px;">${props[key]}</td>
+		// 			</tr>`;
+		// 		}
+		// 		content += `</tbody></table>`;
+		// 	}
+
+		// 	L.popup()
+		// 		.setLatLng(e.latlng)
+		// 		.setContent(content)
+		// 		.openOn(mymap);
+		// 	})
+		// 	.catch(error => {
+  //           console.error("Error saat mengambil GetFeatureInfo:", error);
+  //           L.popup()
+  //               .setLatLng(e.latlng)
+  //               .setContent("<b>Terjadi kesalahan saat mengambil data.</b>")
+  //               .openOn(mymap);
+		// 		});
+		// 	});
+
+        //DRAW CONTROL OR GEOMAN
+		mymap.pm.addControls({  
+		  position: 'topright',
+		  drawMarker: true,
+		  drawPolyline: true,
+		  drawPolygone: true,
+		  drawCircleMarker: false,
+		  rotateMode: false,
+		  drawCircle: false,
+		  drawText: false,
+		  drawRectangle: false,
+		  editMode: false,
+		  dragMode: false,
+		  cutPolygon: false,
+		  removalMode: true
+		}); 
+
+        mymap.on("pm:create", function(e){
+			var jsn = e.layer.toGeoJSON().geometry;
+			// console.log(jsn);
+			var jsn_modified;
+			
+			if (e.shape == 'Marker') {
+				if(confirm("Are you sure you want to add this new Mill?")) {
+					jsn_modified = {type:'Point', coordinates:jsn.coordinates};
+					$("#mill_geometry").val(JSON.stringify(jsn_modified));
+				}	
+			}
+
+			if (e.shape == 'Line') {
+				if(confirm("Are you sure you want to add this new Road?")) {
+					jsn_modified = {type:'MultiLineString', coordinates:[jsn.coordinates]};
+					$("#road_geometry").val(JSON.stringify(jsn_modified));
+				}
+			}
+
+			if (e.shape == 'Polygon') {
+				if(confirm("Are you sure you want to add this new Concession?")) {
+					jsn_modified = {type:'MultiPolygon', coordinates:[jsn.coordinates]};
+					$("#concession_geometry").val(JSON.stringify(jsn_modified));
+				}
+			}
+		});
+
+        //MINIMAP
+		var miniMap = new L.Control.MiniMap(EsriWorldImagery_minimap,{
+			position:'bottomright',
+			height: 120,
+			width: 120
+		}).addTo(mymap);
+
+		//SCALE
+		L.control.scale({position:'bottomright', maxWidth:'200', imperial:false}).addTo(mymap);
+
+		//PRINT MAP
+		var customActionToPrint = function(context, mode) {
+		return function() {
+			window.alert("We are printing the MAP. Let's do Custom print here!");
+			context._printMode(mode);
+		}
+		};
+
+		L.control.browserPrint({
+		title: 'Just print me!',
+		documentTitle: 'Cetak Peta Aktif',
+		closePopupsOnPrint: false,
+		printModes: [
+			L.browserPrint.mode("Auto", {
+				title: "Auto",
+				pageSize: "A4",
+				orientation: "Landscape",
+				force: true,
+				keepCurrentZoomLevel: true,
+				printLayer: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png') // pastikan base map ikut dicetak
+				}),
+			L.browserPrint.mode("Custom", {
+				title: "Select Area",
+				pageSize: "A4",
+				orientation: "Landscape",
+				force: true,
+				keepCurrentZoomLevel: true,
+				printLayer: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png') // pastikan base map ikut dicetak
+				})
+			],
+		manualMode: false,
+		position: 'bottomright'
+		}).addTo(mymap);
+
+					
+	</script>
+	
+</body>
+</html>
